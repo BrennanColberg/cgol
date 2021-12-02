@@ -1,5 +1,5 @@
 import type { NextPage } from "next"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Dimensions, Game, startGame, tickGame } from "../lib/game"
 
 const MAX_CELLS = parseInt(process.env.NEXT_PUBLIC_MAX_CELLS as string)
@@ -10,6 +10,7 @@ const Home: NextPage = () => {
   const [dimensions, setDimensions] = useState<Dimensions>()
   const [game, setGame] = useState<Game>()
   const [darkMode, setDarkMode] = useState<boolean>(false)
+  const hoveredIndices = useMemo<number[]>(() => [], [])
 
   useEffect(() => {
     setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches)
@@ -49,16 +50,11 @@ const Home: NextPage = () => {
         event.y / (window.innerHeight / dimensions.height),
       )
       console.log(gameX, gameY)
-      setGame((game) => {
-        if (!game) return undefined
-        const state = game.state
-        state[gameX + gameY * dimensions!.width] = "black"
-        setGame({ ...game, state })
-      })
+      hoveredIndices.push(gameX + gameY * dimensions!.width)
     }
     window.addEventListener("mousemove", listener)
     return () => window.removeEventListener("mousemove", listener)
-  }, [dimensions])
+  }, [dimensions, hoveredIndices])
 
   const reset = useCallback(() => {
     if (dimensions) setGame(startGame(dimensions, ["red", "blue", "green"]))
@@ -66,7 +62,14 @@ const Home: NextPage = () => {
   useEffect(() => reset(), [reset])
 
   useEffect(() => {
-    const tick = () => setGame((game) => game && tickGame(game))
+    const tick = () =>
+      setGame((game) => {
+        if (!game) return
+        hoveredIndices.splice(0).forEach((index) => {
+          game.state[index] = "black"
+        })
+        return tickGame(game)
+      })
     const interval = setInterval(tick, 50)
     return () => clearInterval(interval)
   }, [])
@@ -76,10 +79,11 @@ const Home: NextPage = () => {
     const { width, height } = game
     const canvas = canvasRef.current?.getContext("2d")
     if (!canvas) return
+
     // first, clear the screen
     canvas.clearRect(0, 0, width, height)
 
-    // first, group all the indices to be set by their color
+    // then, group all the indices to be set by their color
     const colorIndexLists = Object.entries(
       game.state.reduce<{ [key: string]: number[] }>((lists, color, index) => {
         if (!color) return lists
