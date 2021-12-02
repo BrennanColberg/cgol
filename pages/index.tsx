@@ -1,7 +1,7 @@
 import type { NextPage } from "next"
 
 const Home: NextPage = () => {
-  return <>placeholder</>
+  return <p className="text-red-400">placeholder</p>
 }
 
 export default Home
