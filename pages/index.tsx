@@ -2,7 +2,8 @@ import type { NextPage } from "next"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Dimensions, Game, startGame, tickGame } from "../lib/game"
 
-const CELL_SIZE = 5
+const MAX_CELLS = 100000
+const MIN_CELL_SIZE = 5
 
 const Home: NextPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -10,9 +11,14 @@ const Home: NextPage = () => {
   const [game, setGame] = useState<Game>()
 
   const resize = useCallback(() => {
-    let width = Math.floor(window.innerWidth / CELL_SIZE)
-    let height = Math.floor(window.innerHeight / CELL_SIZE)
-    setDimensions({ width, height })
+    const width = window.innerWidth / MIN_CELL_SIZE
+    const height = window.innerHeight / MIN_CELL_SIZE
+    const cells = width * height
+    const scale = Math.sqrt(Math.min(MAX_CELLS, cells) / cells)
+    setDimensions({
+      width: Math.floor(width * scale),
+      height: Math.floor(height * scale),
+    })
   }, [])
 
   useEffect(() => {
