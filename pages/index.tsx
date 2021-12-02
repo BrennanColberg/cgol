@@ -3,12 +3,15 @@ import { useEffect, useState } from "react"
 import { Game, startGame, tickGame } from "../lib/game"
 import classNames from "classnames"
 
+const width = 100
+const height = 100
+
 const Home: NextPage = () => {
-  const [game, setGame] = useState<Game>(startGame({ width: 10, height: 10 }))
+  const [game, setGame] = useState<Game>(startGame({ width, height }))
 
   useEffect(() => {
     const tick = () => setGame((game) => tickGame(game))
-    const interval = setInterval(tick, 1000)
+    const interval = setInterval(tick, 100)
     return () => clearInterval(interval)
   }, [])
 
@@ -21,8 +24,8 @@ const Home: NextPage = () => {
         {game.state.map((alive, i) => (
           <div
             key={i}
-            className={classNames("border border-black", { "bg-black": alive })}
-            style={{ width: "10vmin", height: "10vmin" }}
+            className={classNames({ "bg-black": alive })}
+            style={{ width: `${width / 100}%`, height: `${height / 100}%` }}
           />
         ))}
       </div>
