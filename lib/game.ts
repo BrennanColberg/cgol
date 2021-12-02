@@ -3,18 +3,29 @@
  */
 
 export type Dimensions = Readonly<{ width: number; height: number }>
-export type State = boolean[]
-export type Game = Dimensions & { state: State }
+export type State = (string | null)[]
+export type Game = Dimensions & {
+  colors: string[]
+  state: State
+}
 
-export const startGame = ({ width, height }: Dimensions): Game => ({
+export const startGame = (
+  { width, height }: Dimensions,
+  colors: string[],
+): Game => ({
   width,
   height,
+  colors,
   state: Array(width * height)
-    .fill(undefined)
-    .map(() => Math.random() > 0.5),
+    .fill(null)
+    .map(() =>
+      Math.random() > 0.5
+        ? colors[Math.floor(Math.random() * colors.length)]
+        : null,
+    ),
 })
 
-export const countNeighbors = (game: Game, index: number): number =>
+export const extractNeighbors = (game: Game, index: number): string[] =>
   [
     // top
     game.state[index - game.width],
@@ -28,17 +39,24 @@ export const countNeighbors = (game: Game, index: number): number =>
     (index + 1) % game.width !== 0 && game.state[index + 1],
     (index + 1) % game.width !== 0 && game.state[index - game.width + 1],
     (index + 1) % game.width !== 0 && game.state[index + game.width + 1],
-  ].reduce((result, neighbor) => (neighbor ? result + 1 : result), 0)
+  ].filter((neighbor): neighbor is string => !!neighbor)
 
 export const tickGame = (game: Game): Game => ({
   ...game,
-  state: game.state.map((alive, index) => {
-    const neighbors = countNeighbors(game, index)
+  state: game.state.map((color, index) => {
+    const neighbors = extractNeighbors(game, index)
     // if it's alive with ≤1 or ≥4 neighbors, it dies
-    if (alive && (neighbors <= 1 || neighbors >= 4)) return false
+    if (color && (neighbors.length <= 1 || neighbors.length >= 4)) return null
     // if it's empty with 3 neighbors, it comes to life
-    if (!alive && neighbors === 3) return true
+    if (!color && neighbors.length === 3) {
+      // set it to the same color as the majority of its neighbors
+      if (neighbors[0] === neighbors[1]) return neighbors[0]
+      if (neighbors[0] === neighbors[2]) return neighbors[0]
+      if (neighbors[1] === neighbors[2]) return neighbors[1]
+      // if none has a majority, it dies 🤷‍♂️
+      return null
+    }
     // otherwise, it stays the same (alive or dead)
-    return alive
+    return color
   }),
 })

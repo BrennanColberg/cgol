@@ -39,9 +39,10 @@ const Home: NextPage = () => {
     return () => window.removeEventListener("resize", resize)
   }, [resize])
 
-  useEffect(() => {
-    if (dimensions) setGame(startGame(dimensions))
+  const reset = useCallback(() => {
+    if (dimensions) setGame(startGame(dimensions, ["red", "blue", "green"]))
   }, [dimensions])
+  useEffect(() => reset(), [reset])
 
   useEffect(() => {
     const tick = () => setGame((game) => game && tickGame(game))
@@ -50,21 +51,22 @@ const Home: NextPage = () => {
   }, [])
 
   useEffect(() => {
+    console.log(game)
     if (!game) return
     const { width, height } = game
     const canvas = canvasRef.current?.getContext("2d")
     if (!canvas) return
     canvas.clearRect(0, 0, width, height)
-    canvas.fillStyle = darkMode ? "white" : "black"
-    game.state.forEach((alive, index) => {
-      if (!alive) return
+    game.state.forEach((color, index) => {
+      if (!color) return
+      canvas.fillStyle = color
       canvas.fillRect(index % width, Math.floor(index / width), 1, 1)
     })
   }, [canvasRef, game, darkMode])
 
   return (
     <canvas
-      onClick={() => dimensions && setGame(startGame(dimensions))}
+      onClick={reset}
       style={{
         imageRendering: "crisp-edges",
         backgroundColor: darkMode ? "black" : "white",
