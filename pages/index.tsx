@@ -9,6 +9,18 @@ const Home: NextPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [dimensions, setDimensions] = useState<Dimensions>()
   const [game, setGame] = useState<Game>()
+  const [darkMode, setDarkMode] = useState<boolean>(false)
+
+  useEffect(() => {
+    const listener = (e: any) => setDarkMode(e.matches)
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", listener)
+    return () =>
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .removeEventListener("change", listener)
+  }, [])
 
   const resize = useCallback(() => {
     const width = window.innerWidth / MIN_CELL_SIZE
@@ -43,17 +55,19 @@ const Home: NextPage = () => {
     const canvas = canvasRef.current?.getContext("2d")
     if (!canvas) return
     canvas.clearRect(0, 0, width, height)
+    canvas.fillStyle = darkMode ? "white" : "black"
     game.state.forEach((alive, index) => {
       if (!alive) return
       canvas.fillRect(index % width, Math.floor(index / width), 1, 1)
     })
-  }, [canvasRef, game])
+  }, [canvasRef, game, darkMode])
 
   return (
     <canvas
       onClick={() => dimensions && setGame(startGame(dimensions))}
       style={{
         imageRendering: "crisp-edges",
+        backgroundColor: darkMode ? "black" : "white",
       }}
       width={dimensions?.width}
       height={dimensions?.height}
