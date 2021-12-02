@@ -9,7 +9,9 @@ export type Game = Dimensions & { state: State }
 export const startGame = ({ width, height }: Dimensions): Game => ({
   width,
   height,
-  state: Array(width * height).fill(false),
+  state: Array(width * height)
+    .fill(undefined)
+    .map(() => Math.random() > 0.5),
 })
 
 export const countNeighbors = (game: Game, index: number): number =>
