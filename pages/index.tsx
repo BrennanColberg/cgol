@@ -76,12 +76,26 @@ const Home: NextPage = () => {
     const { width, height } = game
     const canvas = canvasRef.current?.getContext("2d")
     if (!canvas) return
+    // first, clear the screen
     canvas.clearRect(0, 0, width, height)
-    game.state.forEach((color, index) => {
-      if (!color) return
+
+    // first, group all the indices to be set by their color
+    const colorIndexLists = Object.entries(
+      game.state.reduce<{ [key: string]: number[] }>((lists, color, index) => {
+        if (!color) return lists
+        if (lists[color] === undefined) lists[color] = []
+        lists[color].push(index)
+        return lists
+      }, {}),
+    )
+
+    // then, paint each color in sequence
+    colorIndexLists.forEach(([color, indices]) => {
       canvas.fillStyle =
         color === "black" ? (darkMode ? "white" : "black") : color
-      canvas.fillRect(index % width, Math.floor(index / width), 1, 1)
+      indices.forEach((index) => {
+        canvas.fillRect(index % width, Math.floor(index / width), 1, 1)
+      })
     })
   }, [canvasRef, game, darkMode])
 
