@@ -1,21 +1,39 @@
 import type { NextPage } from "next"
-import { useEffect, useRef, useState } from "react"
-import { Game, startGame, tickGame } from "../lib/game"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { Dimensions, Game, startGame, tickGame } from "../lib/game"
 
-const width = 256
-const height = 256
+const CELL_SIZE = 5
 
 const Home: NextPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [game, setGame] = useState<Game>(startGame({ width, height }))
+  const [dimensions, setDimensions] = useState<Dimensions>()
+  const [game, setGame] = useState<Game>()
+
+  const resize = useCallback(() => {
+    let width = Math.floor(window.innerWidth / CELL_SIZE)
+    let height = Math.floor(window.innerHeight / CELL_SIZE)
+    setDimensions({ width, height })
+  }, [])
 
   useEffect(() => {
-    const tick = () => setGame((game) => tickGame(game))
+    resize()
+    window.addEventListener("resize", resize)
+    return () => window.removeEventListener("resize", resize)
+  }, [resize])
+
+  useEffect(() => {
+    if (dimensions) setGame(startGame(dimensions))
+  }, [dimensions])
+
+  useEffect(() => {
+    const tick = () => setGame((game) => game && tickGame(game))
     const interval = setInterval(tick, 50)
     return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
+    if (!game) return
+    const { width, height } = game
     const canvas = canvasRef.current?.getContext("2d")
     if (!canvas) return
     canvas.clearRect(0, 0, width, height)
@@ -26,21 +44,16 @@ const Home: NextPage = () => {
   }, [canvasRef, game])
 
   return (
-    <div
-      className="w-screen h-screen flex justify-center items-center"
-      onClick={() => setGame(startGame({ width, height }))}
-    >
-      <canvas
-        style={{
-          width: "100vmin",
-          height: "100vmin",
-          imageRendering: "crisp-edges",
-        }}
-        width={width}
-        height={height}
-        ref={canvasRef}
-      />
-    </div>
+    <canvas
+      onClick={() => dimensions && setGame(startGame(dimensions))}
+      style={{
+        imageRendering: "crisp-edges",
+      }}
+      width={dimensions?.width}
+      height={dimensions?.height}
+      ref={canvasRef}
+      className="w-screen h-screen"
+    />
   )
 }
 
