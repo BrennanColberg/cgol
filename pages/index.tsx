@@ -12,6 +12,7 @@ const Home: NextPage = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false)
 
   useEffect(() => {
+    setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches)
     const listener = (e: any) => setDarkMode(e.matches)
     window
       .matchMedia("(prefers-color-scheme: dark)")
