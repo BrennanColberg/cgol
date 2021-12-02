@@ -40,6 +40,26 @@ const Home: NextPage = () => {
     return () => window.removeEventListener("resize", resize)
   }, [resize])
 
+  useEffect(() => {
+    const listener = (event: MouseEvent) => {
+      if (!dimensions) return
+      console.log(event.x, event.y)
+      const gameX = Math.floor(event.x / (window.innerWidth / dimensions.width))
+      const gameY = Math.floor(
+        event.y / (window.innerHeight / dimensions.height),
+      )
+      console.log(gameX, gameY)
+      setGame((game) => {
+        if (!game) return undefined
+        const state = game.state
+        state[gameX + gameY * dimensions!.width] = "black"
+        setGame({ ...game, state })
+      })
+    }
+    window.addEventListener("mousemove", listener)
+    return () => window.removeEventListener("mousemove", listener)
+  }, [dimensions])
+
   const reset = useCallback(() => {
     if (dimensions) setGame(startGame(dimensions, ["red", "blue", "green"]))
   }, [dimensions])
@@ -52,7 +72,6 @@ const Home: NextPage = () => {
   }, [])
 
   useEffect(() => {
-    console.log(game)
     if (!game) return
     const { width, height } = game
     const canvas = canvasRef.current?.getContext("2d")
@@ -60,7 +79,8 @@ const Home: NextPage = () => {
     canvas.clearRect(0, 0, width, height)
     game.state.forEach((color, index) => {
       if (!color) return
-      canvas.fillStyle = color
+      canvas.fillStyle =
+        color === "black" ? (darkMode ? "white" : "black") : color
       canvas.fillRect(index % width, Math.floor(index / width), 1, 1)
     })
   }, [canvasRef, game, darkMode])
@@ -71,6 +91,7 @@ const Home: NextPage = () => {
       style={{
         imageRendering: "pixelated",
         backgroundColor: darkMode ? "black" : "white",
+        cursor: "crosshair",
       }}
       width={dimensions?.width}
       height={dimensions?.height}
