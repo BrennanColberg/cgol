@@ -69,7 +69,7 @@ const Home: NextPage = () => {
     <canvas
       onClick={reset}
       style={{
-        imageRendering: "crisp-edges",
+        imageRendering: "pixelated",
         backgroundColor: darkMode ? "black" : "white",
       }}
       width={dimensions?.width}
