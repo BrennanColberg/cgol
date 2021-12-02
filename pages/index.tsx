@@ -2,8 +2,8 @@ import type { NextPage } from "next"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Dimensions, Game, startGame, tickGame } from "../lib/game"
 
-const MAX_CELLS = 100000
-const MIN_CELL_SIZE = 5
+const MAX_CELLS = parseInt(process.env.NEXT_PUBLIC_MAX_CELLS as string)
+const MIN_CELL_SIZE = parseInt(process.env.NEXT_PUBLIC_MIN_CELL_SIZE as string)
 
 const Home: NextPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
