@@ -1,4 +1,4 @@
-import { startGame, countNeighbors } from "./game"
+import { startGame, countNeighbors, tickGame } from "./game"
 describe(startGame, () => {
   it("works with zeroes", () => {
     expect(startGame({ width: 0, height: 0 }).state.length).toBe(0)
@@ -64,5 +64,64 @@ describe(countNeighbors, () => {
     expect(countNeighbors(game, 15)).toBe(4)
     expect(countNeighbors(game, 20)).toBe(5)
     expect(countNeighbors(game, 21)).toBe(4)
+  })
+})
+
+describe(tickGame, () => {
+  const centerStateAfterTick = (binary: number): boolean =>
+    tickGame({
+      width: 3,
+      height: 3,
+      state: (binary + 0b1000000000)
+        .toString(2)
+        .split("")
+        .map((char) => char === "1")
+        .slice(1),
+    }).state[4]
+
+  it("kills cells with ≤1 neighbors", () => {
+    // 0 neighbors
+    expect(centerStateAfterTick(0b000010000)).toBe(false)
+    // 1 neighbors
+    expect(centerStateAfterTick(0b100010000)).toBe(false)
+  })
+  it("keeps cells with 2 or 3 neighbors alive", () => {
+    // 2 neighbors
+    expect(centerStateAfterTick(0b110010000)).toBe(true)
+    // 3 neighbors
+    expect(centerStateAfterTick(0b111010000)).toBe(true)
+  })
+  it("kills cells with ≥4 neighbors", () => {
+    // 4 neighbors
+    expect(centerStateAfterTick(0b111110000)).toBe(false)
+    // 5 neighbors
+    expect(centerStateAfterTick(0b1111110000)).toBe(false)
+    // 6 neighbors
+    expect(centerStateAfterTick(0b1111111000)).toBe(false)
+    // 7 neighbors
+    expect(centerStateAfterTick(0b111111110)).toBe(false)
+    // 8 neighbors
+    expect(centerStateAfterTick(0b111111111)).toBe(false)
+  })
+  it("creates a cell in empty spaces with 3 neighbors", () => {
+    expect(centerStateAfterTick(0b111000000)).toBe(true)
+  })
+  it("leaves empty spaces with ≠3 neighbors alone", () => {
+    // 0 neighbors
+    expect(centerStateAfterTick(0b000000000)).toBe(false)
+    // 1 neighbors
+    expect(centerStateAfterTick(0b100000000)).toBe(false)
+    // 2 neighbors
+    expect(centerStateAfterTick(0b110000000)).toBe(false)
+    // 4 neighbors
+    expect(centerStateAfterTick(0b111100000)).toBe(false)
+    // 5 neighbors
+    expect(centerStateAfterTick(0b111101000)).toBe(false)
+    // 6 neighbors
+    expect(centerStateAfterTick(0b111101100)).toBe(false)
+    // 7 neighbors
+    expect(centerStateAfterTick(0b111101110)).toBe(false)
+    // 8 neighbors
+    expect(centerStateAfterTick(0b111101111)).toBe(false)
   })
 })
