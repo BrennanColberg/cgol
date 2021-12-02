@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 import { Game, startGame, tickGame } from "../lib/game"
 import classNames from "classnames"
 
-const width = 100
-const height = 100
+const width = 20
+const height = 20
 
 const Home: NextPage = () => {
   const [game, setGame] = useState<Game>(startGame({ width, height }))
@@ -16,7 +16,10 @@ const Home: NextPage = () => {
   }, [])
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
+    <div
+      className="w-screen h-screen flex justify-center items-center"
+      onClick={() => setGame(startGame({ width, height }))}
+    >
       <div
         className="flex flex-row flex-wrap"
         style={{ width: "100vmin", height: "100vmin" }}
@@ -25,7 +28,7 @@ const Home: NextPage = () => {
           <div
             key={i}
             className={classNames({ "bg-black": alive })}
-            style={{ width: `${width / 100}%`, height: `${height / 100}%` }}
+            style={{ width: `${100 / width}%`, height: `${100 / height}%` }}
           />
         ))}
       </div>
