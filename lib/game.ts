@@ -15,16 +15,17 @@ export const startGame = ({ width, height }: Dimensions): Game => ({
 export const countNeighbors = (game: Game, index: number): number =>
   [
     // top
-    game.state[index - game.width - 1],
     game.state[index - game.width],
-    game.state[index - game.width + 1],
-    // sides
-    game.state[index - 1],
-    game.state[index + 1],
     // bottom
-    game.state[index + game.width - 1],
     game.state[index + game.width],
-    game.state[index + game.width + 1],
+    // left
+    index % game.width !== 0 && game.state[index - game.width - 1],
+    index % game.width !== 0 && game.state[index - 1],
+    index % game.width !== 0 && game.state[index + game.width - 1],
+    // right
+    (index + 1) % game.width !== 0 && game.state[index + 1],
+    (index + 1) % game.width !== 0 && game.state[index - game.width + 1],
+    (index + 1) % game.width !== 0 && game.state[index + game.width + 1],
   ].reduce((result, neighbor) => (neighbor ? result + 1 : result), 0)
 
 export const tickGame = (game: Game): Game => ({

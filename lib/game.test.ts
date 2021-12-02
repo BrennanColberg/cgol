@@ -47,17 +47,17 @@ describe(countNeighbors, () => {
     expect(countNeighbors(game, 33)).toBe(1)
     expect(countNeighbors(game, 34)).toBe(1)
   })
-  it("counts sides properly", () => {
-    // left
+  it("counts left properly", () => {
     expect(countNeighbors(game, 6)).toBe(1)
     expect(countNeighbors(game, 12)).toBe(3)
     expect(countNeighbors(game, 18)).toBe(2)
-    expect(countNeighbors(game, 24)).toBe(3)
-    // right
-    expect(countNeighbors(game, 7)).toBe(3)
-    expect(countNeighbors(game, 13)).toBe(2)
-    expect(countNeighbors(game, 19)).toBe(1)
-    expect(countNeighbors(game, 25)).toBe(1)
+    expect(countNeighbors(game, 24)).toBe(4)
+  })
+  it("counts right properly", () => {
+    expect(countNeighbors(game, 11)).toBe(3)
+    expect(countNeighbors(game, 17)).toBe(2)
+    expect(countNeighbors(game, 23)).toBe(1)
+    expect(countNeighbors(game, 29)).toBe(1)
   })
   it("counts middle properly", () => {
     expect(countNeighbors(game, 14)).toBe(4)
