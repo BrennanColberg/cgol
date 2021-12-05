@@ -96,7 +96,15 @@ const Home: NextPage = () => {
     // then, paint each color in sequence
     colorIndexLists.forEach(([color, indices]) => {
       canvas.fillStyle =
-        color === "black" ? (darkMode ? "white" : "black") : color
+        color === "red"
+          ? "#dc2626"
+          : color === "green"
+          ? "#059669"
+          : color === "blue"
+          ? "#2563eb"
+          : darkMode
+          ? "#eee"
+          : "#111"
       indices.forEach((index) => {
         canvas.fillRect(index % width, Math.floor(index / width), 1, 1)
       })
@@ -108,7 +116,7 @@ const Home: NextPage = () => {
       onClick={reset}
       style={{
         imageRendering: "pixelated",
-        backgroundColor: darkMode ? "black" : "white",
+        backgroundColor: darkMode ? "#111" : "#fff",
         cursor: "crosshair",
       }}
       width={dimensions?.width}
