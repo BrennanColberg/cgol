@@ -10,7 +10,7 @@ const Home: NextPage = () => {
   const [dimensions, setDimensions] = useState<Dimensions>()
   const [game, setGame] = useState<Game>()
   const [darkMode, setDarkMode] = useState<boolean>(false)
-  const hoveredIndices = useMemo<number[]>(() => [], [])
+  const hoveredIndices = useRef<number[]>([])
 
   useEffect(() => {
     setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches)
@@ -50,11 +50,11 @@ const Home: NextPage = () => {
         event.y / (window.innerHeight / dimensions.height),
       )
       console.log(gameX, gameY)
-      hoveredIndices.push(gameX + gameY * dimensions!.width)
+      hoveredIndices.current.push(gameX + gameY * dimensions!.width)
     }
     window.addEventListener("mousemove", listener)
     return () => window.removeEventListener("mousemove", listener)
-  }, [dimensions, hoveredIndices])
+  }, [dimensions])
 
   const reset = useCallback(() => {
     if (dimensions) setGame(startGame(dimensions, ["red", "blue", "green"]))
@@ -65,7 +65,7 @@ const Home: NextPage = () => {
     const tick = () =>
       setGame((game) => {
         if (!game) return
-        hoveredIndices.splice(0).forEach((index) => {
+        hoveredIndices.current.splice(0).forEach((index) => {
           game.state[index] = "black"
         })
         return tickGame(game)
