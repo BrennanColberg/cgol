@@ -7,6 +7,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <title>Conway&apos;s Game of Life</title>
+        <meta
+          name="description"
+          content="A full-screen in-browser simulation"
+        />
+        <meta name="author" content="Brennan Colberg" />
       </Head>
       <Component {...pageProps} />
     </>
