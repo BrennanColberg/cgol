@@ -6,6 +6,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
+        <script
+          defer
+          data-domain="cgol.app"
+          src="https://plausible.io/js/script.js"
+        />
+
         <title>Conway&apos;s Game of Life</title>
         <meta name="title" content="Conway's Game of Life" />
         <meta
